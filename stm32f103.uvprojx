@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\core;.\fwlib\inc;.\hardware\inc;.\user;.\NET\onenet\inc;.\NET\MQTT;.\NET\device\inc;.\NET\CJSON;.\OLED</IncludePath>
+              <IncludePath>.\core;.\fwlib\inc;.\hardware\inc;.\user;.\NET\onenet\inc;.\NET\MQTT;.\NET\device\inc;.\NET\CJSON;.\OLED;.\TDS</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

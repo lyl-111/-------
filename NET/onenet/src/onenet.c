@@ -44,6 +44,7 @@
 
 
 #include "cJSON.h"
+#include "tds.h"
 
 #define PROID			"E8gtyJviD4"
 
@@ -372,29 +373,42 @@ _Bool OneNet_DevLink(void)
 	
 }
 extern u8 temp,humi;
+extern NPK_Values npk_data;
 unsigned char OneNet_FillBuf(char *buf)
 {
-	
+
 	char text[48];
-	
+
 	memset(text, 0, sizeof(text));
-	
+
 	strcpy(buf, "{\"id\":\"123\",\"params\":{");
-	
+
 	memset(text, 0, sizeof(text));
 	sprintf(text, "\"temp\":{\"value\":%d},", temp);
 	strcat(buf, text);
-	
+
 	memset(text, 0, sizeof(text));
 	sprintf(text, "\"humi\":{\"value\":%d},", humi);
 	strcat(buf, text);
-	
+
+	memset(text, 0, sizeof(text));
+	sprintf(text, "\"nitrogen\":{\"value\":%.1f},", npk_data.nitrogen);
+	strcat(buf, text);
+
+	memset(text, 0, sizeof(text));
+	sprintf(text, "\"phosphorus\":{\"value\":%.1f},", npk_data.phosphorus);
+	strcat(buf, text);
+
+	memset(text, 0, sizeof(text));
+	sprintf(text, "\"potassium\":{\"value\":%.1f},", npk_data.potassium);
+	strcat(buf, text);
+
 	memset(text, 0, sizeof(text));
 	sprintf(text, "\"led\":{\"value\":%s}", led_info.Led_Status ? "true" : "false");
 	strcat(buf, text);
-	
+
 	strcat(buf, "}}");
-	
+
 	return strlen(buf);
 
 }

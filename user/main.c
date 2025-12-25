@@ -17,7 +17,7 @@
 #include "key.h"
 #include "dht11.h"
 #include "oled.h"
-
+#include "tds.h"
 //C库
 #include <string.h>
 
@@ -28,6 +28,7 @@ void Display_Init(void);
 void Refresh_Data(void);
 
 u8 temp,humi;
+NPK_Values npk_data;
 
 /*
 ************************************************************
@@ -78,10 +79,13 @@ int main(void)
 		if(++timeCount >= 100)									//发送间隔5s
 		{
 			DHT11_Read_Data(&temp,&humi);
-			
+
+			float tds_value = TDS_GetData_PPM();
+			npk_data = TDS_Calculate_NPK(tds_value);
+
 //			UsartPrintf(USART_DEBUG, "OneNet_SendData\r\n");
 			OneNet_SendData();									//发送数据
-			
+
 			timeCount = 0;
 			ESP8266_Clear();
 		}
@@ -123,8 +127,10 @@ void Hardware_Init(void)
 	
 	Led_Init();									//蜂鸣器初始化
 	
-	OLED_Init();			//初始化OLED  
-	
+	OLED_Init();			//初始化OLED
+
+	TDS_Init();				//初始化TDS传感器
+
 //	while(DHT11_Init())
 //	{
 ////		UsartPrintf(USART_DEBUG, "DHT11 Error \r\n");
@@ -138,34 +144,41 @@ void Hardware_Init(void)
 
 void Display_Init(void)
 {
-	
+
 	OLED_Clear();
-	
+
 	OLED_ShowCHinese(0,0,1);//温
-	OLED_ShowCHinese(18,0,2);//度
-	OLED_ShowCHinese(36,0,0);//：
-	OLED_ShowCHinese(72,0,3);//℃
-	
-	OLED_ShowCHinese(0,3,4);//湿
-	OLED_ShowCHinese(18,3,5);//度
-	OLED_ShowCHinese(36,3,0);//：
-	OLED_ShowString(72,3,"%",16);//%
-	
-	OLED_ShowCHinese(0,6,6);//台
-	OLED_ShowCHinese(18,6,7);//灯
-	OLED_ShowCHinese(36,6,0);//：
-	
+	OLED_ShowString(18,0,":",16);
+	OLED_ShowCHinese(48,0,3);//℃
+
+	OLED_ShowCHinese(64,0,4);//湿
+	OLED_ShowString(82,0,":",16);
+	OLED_ShowString(112,0,"%",16);//%
+
+	OLED_ShowCHinese(0,2,10);//氮
+	OLED_ShowString(18,2,":",16);
+	OLED_ShowCHinese(40,2,11);//磷
+	OLED_ShowString(58,2,":",16);
+	OLED_ShowCHinese(80,2,12);//钾
+	OLED_ShowString(98,2,":",16);
+
 }
 void Refresh_Data(void)
 {
-	char buf[3];
+	char buf[10];
 	sprintf(buf, "%2d", temp);
-	OLED_ShowString(54,0,(u8*)buf,16); //温度值
-	
+	OLED_ShowString(26,0,(u8*)buf,16); //温度值
+
 	sprintf(buf, "%2d", humi);
-	OLED_ShowString(54,3,(u8*)buf,16); //湿度值
-	
-	if(led_info.Led_Status) OLED_ShowCHinese(54,6,8);//亮
-	else OLED_ShowCHinese(54,6,9);//灭
-	
+	OLED_ShowString(88,0,(u8*)buf,16); //湿度值
+
+	sprintf(buf, "%.1f", npk_data.nitrogen);
+	OLED_ShowString(26,2,(u8*)buf,16); //氮含量
+
+	sprintf(buf, "%.1f", npk_data.phosphorus);
+	OLED_ShowString(66,2,(u8*)buf,16); //磷含量
+
+	sprintf(buf, "%.1f", npk_data.potassium);
+	OLED_ShowString(106,2,(u8*)buf,16); //钾含量
+
 }
