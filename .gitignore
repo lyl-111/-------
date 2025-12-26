@@ -16,6 +16,7 @@
 *.uvguix
 *.dbg*
 *.uvguix.*
+*.axf
 mxproject
 
 RTE/
